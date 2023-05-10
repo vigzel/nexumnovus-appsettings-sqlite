@@ -3,3 +3,8 @@ V1
 2:s1413998555,y
 2:t1413998555,z
 1:1,NexumNovus.AppSettings.Sqlite,,y_,z_
+2:SqliteSettingsRepository_Tests,K
+2:_sut,v
+2:s1936422867,S
+2:t1936422867,T
+1:2,NexumNovus.AppSettings.Sqlite.Test,,S_,T_

@@ -1,6 +1,5 @@
 namespace NexumNovus.AppSettings.Json.Test;
 
-using Microsoft.Data.Sqlite;
 using NexumNovus.AppSettings.Common.Secure;
 using NexumNovus.AppSettings.Sqlite;
 
@@ -8,6 +7,7 @@ public class SqliteSettingsRepository_Tests
 {
   private readonly SqliteSettingsRepository _sut;
   private readonly SqliteConfigurationSource _source;
+  private readonly DbHelperUtils _dbHelperUtils;
 
   public SqliteSettingsRepository_Tests()
   {
@@ -20,11 +20,12 @@ public class SqliteSettingsRepository_Tests
       Protector = mockProtector.Object,
       ReloadOnChange = false,
     };
+    _dbHelperUtils = new DbHelperUtils(_source);
 
     _sut = new SqliteSettingsRepository(_source);
 
-    CreateDb();
-    CleanDb();
+    _dbHelperUtils.CreateDb();
+    _dbHelperUtils.CleanDb();
   }
 
   [Fact]
@@ -36,13 +37,13 @@ public class SqliteSettingsRepository_Tests
         { "Name", "test" },
         { "Age", "36" },
       };
-    SeedDb(initialSettings);
+    _dbHelperUtils.SeedDb(initialSettings);
 
     // Act
     await _sut.UpdateSettingsAsync("name", "New Name").ConfigureAwait(false); // key should be case-insensitive
 
     // Assert
-    var result = GetAllDbSettings();
+    var result = _dbHelperUtils.GetAllDbSettings();
     result.Count.Should().Be(2);
     result["name"].Should().Be("New Name");
   }
@@ -56,13 +57,13 @@ public class SqliteSettingsRepository_Tests
         { "Name", "test" },
         { "Age", "36" },
       };
-    SeedDb(initialSettings);
+    _dbHelperUtils.SeedDb(initialSettings);
 
     // Act
     await _sut.UpdateSettingsAsync("Surname", "New Surname").ConfigureAwait(false);
 
     // Assert
-    var result = GetAllDbSettings();
+    var result = _dbHelperUtils.GetAllDbSettings();
     result.Count.Should().Be(3);
     result["surname"].Should().Be("New Surname");
   }
@@ -76,7 +77,7 @@ public class SqliteSettingsRepository_Tests
         { "Name", "test" },
         { "Age", "36" },
       };
-    SeedDb(initialSettings);
+    _dbHelperUtils.SeedDb(initialSettings);
 
     // Act
     await _sut.UpdateSettingsAsync("Account", new TestSetting
@@ -86,7 +87,7 @@ public class SqliteSettingsRepository_Tests
     }).ConfigureAwait(false);
 
     // Assert
-    var result = GetAllDbSettings();
+    var result = _dbHelperUtils.GetAllDbSettings();
     result.Count.Should().Be(6);
     result["Account:Name"].Should().Be("demo");
     result["Account:Password*"].Should().Be("***");
@@ -101,7 +102,7 @@ public class SqliteSettingsRepository_Tests
         { "Name", "test" },
         { "Age", "36" },
       };
-    SeedDb(initialSettings);
+    _dbHelperUtils.SeedDb(initialSettings);
 
     // Act
     await _sut.UpdateSettingsAsync("Account", new TestSetting
@@ -117,86 +118,13 @@ public class SqliteSettingsRepository_Tests
     }).ConfigureAwait(false);
 
     // Assert
-    var result = GetAllDbSettings();
+    var result = _dbHelperUtils.GetAllDbSettings();
     result.Count.Should().Be(9);
     result["Account:Types:0"].Should().Be("A");
     result["Account:Types:1"].Should().Be("B");
     result["Account:Types:2"].Should().Be("C");
     result["Account:Data:A"].Should().Be("1");
     result["Account:Data:B"].Should().Be("2");
-  }
-
-  private void CreateDb()
-  {
-    using (var connection = new SqliteConnection(_source.ConnectionString))
-    {
-      connection.Open(); // this will create the database file, if it does not exist
-
-      var command = connection.CreateCommand();
-      command.CommandText = _source.CreateTableCommand;
-      command.ExecuteNonQuery();
-    }
-  }
-
-  private Dictionary<string, string?> GetAllDbSettings()
-  {
-    var settings = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
-    using (var connection = new SqliteConnection(_source.ConnectionString))
-    {
-      connection.Open();
-
-      var command = connection.CreateCommand();
-      command.CommandText = _source.GetAllQuery;
-
-      using (var reader = command.ExecuteReader())
-      {
-        while (reader.Read())
-        {
-          var key = reader.GetString(0);
-          var value = reader.IsDBNull(1) ? null : reader.GetString(1);
-          settings.Add(key, value);
-        }
-      }
-    }
-
-    return settings;
-  }
-
-  private void SeedDb(Dictionary<string, string?> seedData)
-  {
-    using (var connection = new SqliteConnection(_source.ConnectionString))
-    {
-      connection.Open(); // this will create the database file, if it does not exist
-
-      using (var command = connection.CreateCommand())
-      {
-        command.CommandText = _source.InsertCommand;
-        command.Parameters.Add("@key", SqliteType.Text);
-        command.Parameters.Add("@value", SqliteType.Text);
-        command.Parameters.Add("@lastUpdateDt", SqliteType.Text);
-
-        foreach (var item in seedData)
-        {
-          command.Parameters["@key"].Value = item.Key;
-          command.Parameters["@value"].Value = item.Value as object ?? DBNull.Value;
-          command.Parameters["@lastUpdateDt"].Value = DateTime.UtcNow;
-
-          command.ExecuteNonQuery();
-        }
-      }
-    }
-  }
-
-  private void CleanDb()
-  {
-    using (var connection = new SqliteConnection(_source.ConnectionString))
-    {
-      connection.Open(); // this will create the database file, if it does not exist
-
-      var command = connection.CreateCommand();
-      command.CommandText = $"DELETE FROM {_source.TableName}";
-      command.ExecuteNonQuery();
-    }
   }
 
   private sealed class TestSetting
