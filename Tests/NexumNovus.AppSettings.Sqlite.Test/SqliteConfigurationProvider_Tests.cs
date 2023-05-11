@@ -3,6 +3,7 @@ namespace NexumNovus.AppSettings.Json.Test;
 using NexumNovus.AppSettings.Common.Secure;
 using NexumNovus.AppSettings.Sqlite;
 
+[Collection("Sequential")]
 public class SqliteConfigurationProvider_Tests : IDisposable
 {
   private readonly SqliteConfigurationProvider _sut;

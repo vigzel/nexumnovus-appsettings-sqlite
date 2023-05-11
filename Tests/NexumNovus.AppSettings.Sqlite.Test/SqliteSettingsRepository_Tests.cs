@@ -3,6 +3,7 @@ namespace NexumNovus.AppSettings.Json.Test;
 using NexumNovus.AppSettings.Common.Secure;
 using NexumNovus.AppSettings.Sqlite;
 
+[Collection("Sequential")]
 public class SqliteSettingsRepository_Tests
 {
   private readonly SqliteSettingsRepository _sut;
@@ -125,6 +126,29 @@ public class SqliteSettingsRepository_Tests
     result["Account:Types:2"].Should().Be("C");
     result["Account:Data:A"].Should().Be("1");
     result["Account:Data:B"].Should().Be("2");
+  }
+
+  [Fact]
+  public async Task Should_Update_Sectioned_Setting_Async()
+  {
+    // Arrange
+    var initialSettings = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+      {
+        { "Person:Name", "test" },
+        { "Person:Age", "36" },
+        { "Person:NameMiddle", "middle name" },
+      };
+    _dbHelperUtils.SeedDb(initialSettings);
+
+    // Act
+    await _sut.UpdateSettingsAsync("Person:Name", "NewName").ConfigureAwait(false);
+
+    // Assert
+    var result = _dbHelperUtils.GetAllDbSettings();
+    result.Count.Should().Be(3);
+    result["Person:Name"].Should().Be("NewName");
+    result["Person:Age"].Should().Be("36");
+    result["Person:NameMiddle"].Should().Be("middle name");
   }
 
   private sealed class TestSetting
