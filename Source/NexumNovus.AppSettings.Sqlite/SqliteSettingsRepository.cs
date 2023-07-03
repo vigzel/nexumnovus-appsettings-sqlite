@@ -1,5 +1,6 @@
 namespace NexumNovus.AppSettings.Sqlite;
 
+using System.Linq;
 using Microsoft.Data.Sqlite;
 using NexumNovus.AppSettings.Common;
 using NexumNovus.AppSettings.Common.Secure;
@@ -57,7 +58,7 @@ public class SqliteSettingsRepository : ISettingsRepository
       }
 
       var keysToAdd = flatSettings.Keys
-        .Where(x => !keysToUpdate.Contains(x, StringComparer.OrdinalIgnoreCase) && !keysToDelete.Contains(x, StringComparer.OrdinalIgnoreCase));
+        .Where(x => !dbSettings.ContainsKey(x));
 
       if (!keysToAdd.Any() && !keysToUpdate.Any() && !keysToDelete.Any())
       {
