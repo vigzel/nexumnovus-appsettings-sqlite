@@ -8,3 +8,6 @@ V1
 2:s1936422867,S
 2:t1936422867,T
 1:2,NexumNovus.AppSettings.Sqlite.Test,,S_,T_
+2:Should_Update_Complex_Objects_Async,l
+2:initialSettings,i
+2:result,q

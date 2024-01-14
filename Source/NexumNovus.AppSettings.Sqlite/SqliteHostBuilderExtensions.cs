@@ -40,10 +40,7 @@ public static class SqliteHostBuilderExtensions
   /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
   public static IHostBuilder AddSQLiteConfig(this IHostBuilder builder, Action<SqliteConfigurationSource> configureSource)
   {
-    if (builder == null)
-    {
-      throw new ArgumentNullException(nameof(builder));
-    }
+    ArgumentNullException.ThrowIfNull(builder);
 
     var source = new SqliteConfigurationSource();
     configureSource?.Invoke(source);

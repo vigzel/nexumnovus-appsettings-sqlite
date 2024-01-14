@@ -41,7 +41,7 @@ public class SqliteSettingsRepository_Tests
     _dbHelperUtils.SeedDb(initialSettings);
 
     // Act
-    await _sut.UpdateSettingsAsync("name", "New Name").ConfigureAwait(false); // key should be case-insensitive
+    await _sut.UpdateSettingsAsync("name", "New Name").ConfigureAwait(true); // key should be case-insensitive
 
     // Assert
     var result = _dbHelperUtils.GetAllDbSettings();
@@ -61,7 +61,7 @@ public class SqliteSettingsRepository_Tests
     _dbHelperUtils.SeedDb(initialSettings);
 
     // Act
-    await _sut.UpdateSettingsAsync("Surname", "New Surname").ConfigureAwait(false);
+    await _sut.UpdateSettingsAsync("Surname", "New Surname").ConfigureAwait(true);
 
     // Assert
     var result = _dbHelperUtils.GetAllDbSettings();
@@ -85,7 +85,7 @@ public class SqliteSettingsRepository_Tests
     {
       Name = "demo",
       Password = "demo",
-    }).ConfigureAwait(false);
+    }).ConfigureAwait(true);
 
     // Assert
     var result = _dbHelperUtils.GetAllDbSettings();
@@ -116,7 +116,7 @@ public class SqliteSettingsRepository_Tests
         { "A", 1 },
         { "B", 2 },
       },
-    }).ConfigureAwait(false);
+    }).ConfigureAwait(true);
 
     // Assert
     var result = _dbHelperUtils.GetAllDbSettings();
@@ -141,7 +141,7 @@ public class SqliteSettingsRepository_Tests
     _dbHelperUtils.SeedDb(initialSettings);
 
     // Act
-    await _sut.UpdateSettingsAsync("Person:Name", "NewName").ConfigureAwait(false);
+    await _sut.UpdateSettingsAsync("Person:Name", "NewName").ConfigureAwait(true);
 
     // Assert
     var result = _dbHelperUtils.GetAllDbSettings();

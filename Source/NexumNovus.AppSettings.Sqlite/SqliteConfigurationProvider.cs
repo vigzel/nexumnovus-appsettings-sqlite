@@ -11,7 +11,7 @@ using NexumNovus.AppSettings.Common.Utils;
 public class SqliteConfigurationProvider : NexumDbConfigurationProvider<SqliteConfigurationSource>
 {
   private bool _dbInitialized;
-  private object _dbLock = new();
+  private object _dbLock = new ();
 
   /// <summary>
   /// Initializes a new instance of the <see cref="SqliteConfigurationProvider"/> class.
