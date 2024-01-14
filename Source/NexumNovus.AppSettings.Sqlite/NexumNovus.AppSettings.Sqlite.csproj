@@ -11,8 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.9" />
-    <PackageReference Include="NexumNovus.AppSettings.Common" Version="0.3.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.1" />
+    <PackageReference Include="NexumNovus.AppSettings.Common" Version="0.6.0" />
   </ItemGroup>
 
 </Project>
